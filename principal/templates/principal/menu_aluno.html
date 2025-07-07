@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Lista do Dia{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+
+  <h2 class="mb-3">Lista do Dia: {{ lista.data }}</h2>
+
+  <div class="d-flex align-items-center mb-3">
+    <p class="me-3 mb-0">Status: 
+      <span class="badge bg-{{ 'success' if lista.aberta else 'secondary' }}">
+        {{ 'Aberta' if lista.aberta else 'Fechada' }}
+      </span>
+    </p>
+    <p class="mb-0">Confirmados: <strong>{{ total_confirmados }} / {{ max_usuarios }}</strong></p>
+  </div>
+
+  <div class="mb-4">
+    {% if presenca %}
+      <div class="alert alert-info" role="alert">
+        Você está na lista, posição: <strong>{{ presenca.posicao }}</strong>
+      </div>
+      <form method="post" class="d-inline">
+        {% csrf_token %}
+        <button name="remover" type="submit" class="btn btn-danger">Remover meu nome</button>
+      </form>
+
+    {% elif lista.aberta and total_confirmados < max_usuarios %}
+      <form method="post" class="d-inline">
+        {% csrf_token %}
+        <button name="confirmar" type="submit" class="btn btn-success">Confirmar presença</button>
+      </form>
+
+    {% else %}
+      <div class="alert alert-warning" role="alert">
+        Não é possível confirmar presença no momento.
+      </div>
+    {% endif %}
+  </div>
+
+  <hr>
+
+  <h3>Lista atual</h3>
+
+  {% if presencas %}
+    <ol class="list-group list-group-numbered">
+      {% for p in presencas %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ p.aluno.nome }}
+          <span class="badge bg-primary rounded-pill">{{ forloop.counter }}</span>
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="text-muted fst-italic">Nenhum aluno confirmado.</p>
+  {% endif %}
+
+</div>
+{% endblock %}
